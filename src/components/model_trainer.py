@@ -44,40 +44,55 @@ class ModelTrainer:
                 "Gradient Boosting": GradientBoostingRegressor(),
                 "Linear Regression" : LinearRegression(),
                 "XGB Regressor" : XGBRegressor(),
-                "AdaBoost Classifier" : AdaBoostRegressor(),
-                "CatBoosting Classifier" : CatBoostRegressor(verbose = False)
+                "AdaBoost Regressor" : AdaBoostRegressor(),
+                "CatBoosting Regressor" : CatBoostRegressor(verbose = False)
             }
             params = {
-                "Decision Tree": {
-                    'criterion' : ['squared_error', 'friedman_mse', 'absolute_error', 'poisson'],
-                },
-                
-                "Random Forest" : {
-                    'n_estimators' : [8, 16, 32, 64, 128, 256]
-                },
-                
-                "Gradient Boosting" : {
-                    'learning_rate' : [.1,.01,.05,.001],
-                    'subsample': [0.6, 0.7, 0.75, 0.8, 0.85, 0.9],
-                    'n_estimators' : [8,16,32,64,128,256]
-                },
-                "Linear Regression": {},
-                'XGBRegressor': {
-                    'learning_rate' : [.1,.01,.05,.001],
-                    'n_estimators': [8,16,32,64,128,256]
-                },
-                "CatBoosting Regressor" : {
-                    'depth' : [6, 8, 10],
-                    'learning_rate' : [0.01, 0.05, 0.1],
-                    'iterations': [30, 50, 100]
-                },
-                "Adaboost Regressor" : {
-                    'learning_rate' : [0.1, .01, 0.5, 0.001],
-                    'n_estimators': [8,16,32,64,128,256]
-                }
-            }
+
+    "Decision Tree": {
+        'criterion': ['squared_error', 'friedman_mse', 'absolute_error']
+    },
+
+    "Random Forest": {
+        'n_estimators': [50, 100, 200]
+    },
+
+    "Gradient Boosting": {
+        'learning_rate': [0.01, 0.05, 0.1],
+        'subsample': [0.8, 0.9, 1.0],
+        'n_estimators': [50, 100]
+    },
+
+    "Linear Regression": {},
+
+    "XGB Regressor": {
+        'learning_rate': [0.01, 0.1],
+        'n_estimators': [50, 100]
+    },
+
+    "AdaBoost Regressor": {
+        'learning_rate': [0.01, 0.1, 0.5],
+        'n_estimators': [50, 100]
+    },
+
+    "CatBoosting Regressor": {
+        'depth': [6, 8],
+        'learning_rate': [0.01, 0.1],
+        'iterations': [50, 100]
+    }
+}
+
             
-            model_report: dict = evaluate_models(X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test, models = models, params = params)
+            
+            model_report, trained_models = evaluate_models(
+    X_train=X_train,
+    y_train=y_train,
+    X_test=X_test,
+    y_test=y_test,
+    models=models,
+    params=params
+)
+
             
             
             ## To get best model score from dict
@@ -88,7 +103,8 @@ class ModelTrainer:
             best_model_name = list(model_report.keys())[
                 list(model_report.values()).index(best_model_score)
             ]
-            best_model = models[best_model_name]
+            best_model = trained_models[best_model_name]
+
             
             if best_model_score<0.6:
                 raise CustomException("No best model found !")
